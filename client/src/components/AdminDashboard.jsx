@@ -12,7 +12,7 @@ const AdminDashboard = () => {
 
     const fetchSessions = async () => {
         try {
-            const res = await fetch('http://localhost:3000/api/sessions');
+            const res = await fetch('/api/sessions');
             const data = await res.json();
             setSessions(data);
         } catch (err) {
@@ -29,7 +29,7 @@ const AdminDashboard = () => {
 
     const fetchErrors = async () => {
         try {
-            const res = await fetch('http://localhost:3000/api/admin/errors');
+            const res = await fetch('/api/admin/errors');
             const data = await res.json();
             setErrors(data);
         } catch (e) {
@@ -47,7 +47,7 @@ const AdminDashboard = () => {
         e.preventDefault();
         setTestStatus({ type: 'info', msg: 'Sending...' });
         try {
-            const res = await fetch('http://localhost:3000/api/admin/test-email', {
+            const res = await fetch('/api/admin/test-email', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ email: testEmail })

@@ -14,7 +14,7 @@ The AI assistant, **Daniel**, will interview you and generate a report.
     - Open `c:/working/aiscoper/server/.env`
     - Replace `YOUR_API_KEY_HERE` with your actual Google Gemini API Key.
 
-2.  **Start the Backend Server**
+2.  **Start the Backend Server and Main Site**
     Open a new terminal:
     ```bash
     cd c:/working/aiscoper/server
@@ -22,7 +22,7 @@ The AI assistant, **Daniel**, will interview you and generate a report.
     ```
     *Server should run on http://localhost:3000*
 
-3.  **Start the Frontend Client**
+3.  **Start the Hot Reloading Development Client**
     Open another terminal:
     ```bash
     cd c:/working/aiscoper/client

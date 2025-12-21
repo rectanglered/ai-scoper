@@ -12,12 +12,29 @@ function App() {
   const [sessionId, setSessionId] = useState(null);
   const [contactSubmitted, setContactSubmitted] = useState(false);
   const [messageSent, setMessageSent] = useState(false);
+  const [serverStatus, setServerStatus] = useState('checking'); // checking, online, offline
 
-  // Simple URL check for admin mode
   useEffect(() => {
+    // Admin check
     if (window.location.pathname === '/admin') {
       setShowAdmin(true);
     }
+
+    // Health check
+    const checkHealth = async () => {
+      try {
+        const res = await fetch('/api/health');
+        if (res.ok) setServerStatus('online');
+        else setServerStatus('offline');
+      } catch (e) {
+        setServerStatus('offline');
+      }
+    };
+
+    checkHealth();
+    // Poll every 30 seconds
+    const interval = setInterval(checkHealth, 30000);
+    return () => clearInterval(interval);
   }, []);
 
   const handleOnboardingComplete = (data) => {
@@ -31,7 +48,7 @@ function App() {
 
   const handleContactSubmit = async (contactData) => {
     try {
-      await fetch('http://localhost:3000/api/submit-contact', {
+      await fetch('/api/submit-contact', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ sessionId, contact: contactData })
@@ -109,7 +126,7 @@ function App() {
                   const formData = new FormData(e.target);
                   const message = formData.get('message');
 
-                  fetch('http://localhost:3000/api/submit-message', {
+                  fetch('/api/submit-message', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ sessionId, message })
@@ -148,6 +165,10 @@ function App() {
 
       <footer className="mt-12 text-sm text-gray-400">
         &copy; {new Date().getFullYear()} Rectangle Red. Powered by Daniel AI.
+        <span className="ml-4 inline-flex items-center space-x-2" title={serverStatus === 'online' ? "Server Online" : "Server Offline"}>
+          <span className={`block w-2 h-2 rounded-full ${serverStatus === 'online' ? 'bg-green-500' : serverStatus === 'checking' ? 'bg-yellow-500' : 'bg-red-500'}`}></span>
+          <span className="text-xs text-gray-400 capitalize">{serverStatus}</span>
+        </span>
       </footer>
     </div >
   );

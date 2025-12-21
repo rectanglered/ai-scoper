@@ -6,6 +6,7 @@ const ChatInterface = ({ onboardingData, onComplete }) => {
     const [input, setInput] = useState('');
     const [sessionId, setSessionId] = useState(null);
     const [loading, setLoading] = useState(false);
+    const [error, setError] = useState(null);
     const bottomRef = useRef(null);
 
     const initializedRef = useRef(false);
@@ -25,12 +26,14 @@ const ChatInterface = ({ onboardingData, onComplete }) => {
 
     const startSession = async (data) => {
         setLoading(true);
+        setError(null);
         try {
-            const response = await fetch('http://localhost:3000/api/start-session', {
+            const response = await fetch('/api/start-session', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(data) // Pass the full structured object
             });
+            if (!response.ok) throw new Error('Failed to start session');
             const resData = await response.json();
             setSessionId(resData.sessionId);
 
@@ -50,6 +53,7 @@ const ChatInterface = ({ onboardingData, onComplete }) => {
             ]);
         } catch (err) {
             console.error(err);
+            setError("Connection failed. Please check if the server is running on the same port.");
             setMessages(prev => [...prev, { role: 'error', content: 'Connection failed. Is the server running?' }]);
         }
         setLoading(false);
@@ -60,6 +64,7 @@ const ChatInterface = ({ onboardingData, onComplete }) => {
 
         const userMsg = input;
         setInput('');
+        setError(null);
 
         // Safety check - though we should always have a session by now
         if (!sessionId) return;
@@ -68,11 +73,12 @@ const ChatInterface = ({ onboardingData, onComplete }) => {
         setLoading(true);
 
         try {
-            const response = await fetch('http://localhost:3000/api/answer', {
+            const response = await fetch('/api/answer', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ sessionId, answer: userMsg })
             });
+            if (!response.ok) throw new Error('Failed to get answer');
             const data = await response.json();
 
             if (data.completed) {
@@ -82,6 +88,8 @@ const ChatInterface = ({ onboardingData, onComplete }) => {
             }
         } catch (err) {
             console.error(err);
+            setError("Failed to send message. Server might be unreachable.");
+            setMessages(prev => [...prev, { role: 'error', content: 'Failed to send message.' }]);
         }
         setLoading(false);
     };
@@ -107,6 +115,12 @@ const ChatInterface = ({ onboardingData, onComplete }) => {
             </div>
 
             <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-50">
+                {error && (
+                    <div className="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 rounded shadow-sm">
+                        <p className="font-bold">Connection Error</p>
+                        <p className="text-sm">{error}</p>
+                    </div>
+                )}
                 {messages.length === 0 && (
                     <div className="text-center text-gray-500 mt-10">
                         <p className="text-lg font-medium">Hello! I'm Daniel.</p>

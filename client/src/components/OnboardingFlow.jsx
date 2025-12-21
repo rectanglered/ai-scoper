@@ -46,7 +46,7 @@ const OnboardingFlow = ({ onComplete }) => {
     const fetchFeatures = async () => {
         setLoading(true);
         try {
-            const res = await fetch('http://localhost:3000/api/suggest-features', {
+            const res = await fetch('/api/suggest-features', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -73,7 +73,7 @@ const OnboardingFlow = ({ onComplete }) => {
         }
         setLoading(true);
         try {
-            const res = await fetch('http://localhost:3000/api/suggest-name', {
+            const res = await fetch('/api/suggest-name', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ description: data.description })
