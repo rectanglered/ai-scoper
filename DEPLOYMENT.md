@@ -7,6 +7,30 @@ On the Windows Server, install:
 *   [Node.js (LTS Version)](https://nodejs.org/) - Ensure it's added to PATH.
 *   [Git for Windows](https://git-scm.com/download/win) - Standard installation.
 
+### ⚠️ Node.js Version Warning
+This project requires **Node.js v20.19.0+** or **v22.12.0+**.
+If your server runs an older or incompatible version (e.g., v21) and you cannot change the global version, we recommend using **nvm-windows**.
+
+**Using NVM to avoid conflicts:**
+1.  Install [nvm-windows](https://github.com/coreybutler/nvm-windows/releases).
+2.  Install the required version: `nvm install 22.12.0`.
+3.  **Important:** `node-windows` services will use the `node.exe` that runs the installation script.
+    To ensure the service uses v22.12.0 permanently, regardless of the system default, run the installer using the **absolute path** to the versioned executable.
+    
+    *Example:*
+    ```powershell
+    # 1. Build Client
+    nvm use 22.12.0
+    cd client
+    npm install
+    npm run build
+    
+    # 2. Install Service (Pin to v22)
+    cd ..\server
+    & "C:\Users\<User>\AppData\Roaming\nvm\v22.12.0\node.exe" install_service.js
+    ```
+    *Replace `<User>` with your username or check `nvm root` to find the path.*
+
 ## 2. Clone Repository
 Open PowerShell or Command Prompt:
 ```powershell

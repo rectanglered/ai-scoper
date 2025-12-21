@@ -227,19 +227,17 @@ router.post('/submit-contact', async (req, res) => {
 router.get('/sessions', async (req, res) => {
     try {
         const allowedIps = ['90.255.245.96', '90.255.245.39', '127.0.0.1', '::1'];
-        const clientIp = req.ip || req.connection.remoteAddress;
+        // IIS/Proxy sets X-Forwarded-For, but app.set('trust proxy', 1) in app.js makes req.ip correct.
+        const ip = req.ip || req.connection.remoteAddress;
 
-        // Simple normalization to handle ::ffff: prefixes if strictly IPv4 matching is desired, 
-        // but exact matching often suffices if we include generic formats.
-        // Let's be permissive with ::1 for localhost.
+        // Normalize IPv6 mapped IPv4
+        const normalizedIp = ip.replaceAsync ? ip : (ip.startsWith('::ffff:') ? ip.substring(7) : ip);
 
-        let normalizedIp = clientIp;
-        if (clientIp.startsWith('::ffff:')) {
-            normalizedIp = clientIp.substr(7);
-        }
+        console.log(`[Admin Access] Request from IP: ${normalizedIp} (Raw: ${ip})`);
 
+        // Check if IP is allowed
         if (!allowedIps.includes(normalizedIp) && normalizedIp !== '::1') {
-            console.warn(`Unauthorized access attempt to /api/sessions from IP: ${clientIp} (Normalized: ${normalizedIp})`);
+            console.warn(`[Admin Access] BLOCKED: ${normalizedIp}`);
             return res.status(403).json({ error: 'Access denied: Unauthorized IP address' });
         }
 
