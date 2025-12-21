@@ -15,8 +15,16 @@ app.use(express.json());
 app.use('/api', apiRoutes);
 
 // Health check
-app.get('/', (req, res) => {
-    res.send('Daniel (AI Scoper) API is running');
+// Health check moved or removed to allow UI to load
+// app.get('/', (req, res) => res.send('API Running'));
+
+// Serve static files from the React client
+const clientBuildPath = path.join(__dirname, '../../client/dist');
+app.use(express.static(clientBuildPath));
+
+// Handle React routing, return all requests to React app
+app.get(/.*/, (req, res) => {
+    res.sendFile(path.join(clientBuildPath, 'index.html'));
 });
 
 // Start server
