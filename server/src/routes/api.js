@@ -4,6 +4,10 @@ const geminiService = require('../services/gemini');
 const { Session, ErrorLog } = require('../database');
 
 // Start a new scoping session
+router.get('/health', (req, res) => {
+    res.json({ status: 'ok', timestamp: new Date() });
+});
+
 router.post('/start-session', async (req, res) => {
     try {
         const sessionId = Date.now().toString();
@@ -199,6 +203,11 @@ router.post('/submit-contact', async (req, res) => {
 
                 await sgMail.send(msg);
                 console.log('Notification email sent successfully');
+                await ErrorLog.create({
+                    level: 'info',
+                    message: `New Lead Email Sent: ${contact.email} - ${session.projectName}`,
+                    timestamp: new Date()
+                });
             } else {
                 console.warn('Email config missing, skipping notification.');
             }
@@ -277,6 +286,11 @@ router.post('/submit-message', async (req, res) => {
             };
 
             await sgMail.send(msg);
+            await ErrorLog.create({
+                level: 'info',
+                message: `Follow-up Message Email Sent: ${session.contactEmail} - ${session.projectName}`,
+                timestamp: new Date()
+            });
         }
 
         res.json({ success: true });
@@ -313,6 +327,11 @@ router.post('/admin/test-email', async (req, res) => {
         };
 
         await sgMail.send(msg);
+        await ErrorLog.create({
+            level: 'info',
+            message: `Admin Test Email Sent: ${email}`,
+            timestamp: new Date()
+        });
         res.json({ success: true });
     } catch (error) {
         console.error('Test email failed:', error);

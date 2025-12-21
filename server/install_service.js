@@ -1,5 +1,6 @@
 const Service = require('node-windows').Service;
 const path = require('path');
+require('dotenv').config();
 
 // Create a new service object
 const svc = new Service({
@@ -9,7 +10,7 @@ const svc = new Service({
     env: [
         {
             name: "PORT",
-            value: 3000
+            value: process.env.PORT || 3000
         },
         {
             name: "NODE_ENV",
@@ -34,7 +35,7 @@ svc.on('alreadyinstalled', function () {
 
 svc.on('start', function () {
     console.log('Service started!');
-    console.log('App is running on port 3000.');
+    console.log(`App is running on port ${process.env.PORT || 3000}.`);
 });
 
 // Install the script as a service.
