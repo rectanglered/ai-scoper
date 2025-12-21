@@ -231,14 +231,15 @@ router.get('/sessions', async (req, res) => {
         const ip = req.ip || req.connection.remoteAddress;
 
         // Normalize IPv6 mapped IPv4
-        const normalizedIp = ip.replaceAsync ? ip : (ip.startsWith('::ffff:') ? ip.substring(7) : ip);
+        // Normalize IPv6 mapped IPv4
+        const normalizedIp = ip.startsWith('::ffff:') ? ip.substring(7) : ip;
 
         console.log(`[Admin Access] Request from IP: ${normalizedIp} (Raw: ${ip})`);
 
         // Check if IP is allowed
         if (!allowedIps.includes(normalizedIp) && normalizedIp !== '::1') {
             console.warn(`[Admin Access] BLOCKED: ${normalizedIp}`);
-            return res.status(403).json({ error: 'Access denied: Unauthorized IP address' });
+            return res.status(403).json({ error: `Access denied: Unauthorized IP address (${normalizedIp})` });
         }
 
         const sessions = await Session.findAll({
