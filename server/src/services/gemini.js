@@ -90,20 +90,27 @@ async function generateReport(projectIdea, answers) {
     Project Idea: ${projectIdea}
     Client Answers: ${JSON.stringify(answers)}
     
-    REFERENCE EXAMPLES (Adopt this style/tone/structure):
+    REFERENCE EXAMPLES (STRICTLY FOLLOW THIS STYLE/TONE/STRUCTURE):
     ${exampleContext}
 
-    Task: Generate a markdown implementation plan using the style and structure from the examples above.
-    The report should be detailed and professional.
+    Task: Generate a markdown implementation plan acting as "Daniel", a single, highly competent senior developer who works quickly and efficiently.
     
-    Include sections relevant to the project, such as:
-    1. Executive Summary
-    2. Scope of Work (Functional & Non-functional)
-    3. Technical Architecture
-    4. Roadmap / Timeline
-    5. Cost Estimates (if implied by budget)
+    CRITICAL INSTRUCTIONS:
+    1. **Style**: Use the exact markdown structure and professional yet accessible tone from the examples.
+    2. **Persona**: You are ONE developer, not a team. Use "I" (Daniel) or "We" (Rectangle Red) as appropriate, but estimates should reflect a single high-speed expert.
+    3. **Currency**: ALL costs must be in **GBP (£)**.
+    4. **Rate**: Use a day rate of **£562.50 + VAT**.
+    5. **Timeline**: Be realistic but efficient (e.g., "1-2 weeks" for MVP if simple).
+    6. **Cost Estimates**: Provide a clear breakdown based on the day rate.
+
+    Report Structure:
+    1. **Executive Summary**: Brief overview of the solution.
+    2. **Scope of Work**: Functional & Non-functional requirements.
+    3. **Technical Architecture**: Stack choices and rationale.
+    4. **Roadmap / Timeline**: Phased approach.
+    5. **Cost Estimates**: Detailed estimate using £562.50/day.
     
-    Output in Markdown.
+    Output nothing but the Markdown report.
   `;
 
   const result = await model.generateContent(prompt);

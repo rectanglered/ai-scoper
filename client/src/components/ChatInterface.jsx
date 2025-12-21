@@ -95,9 +95,15 @@ const ChatInterface = ({ onboardingData, onComplete }) => {
 
     return (
         <div className="flex flex-col h-[600px] w-full max-w-2xl bg-white shadow-xl rounded-lg overflow-hidden border border-gray-200">
-            <div className="bg-red-600 p-4 text-white font-bold text-lg flex items-center justify-between">
-                <span>Daniel (Rectangle Red)</span>
-                <span className="text-xs bg-red-800 px-2 py-1 rounded">Scoping Assistant</span>
+            <div className="bg-white p-6 border-b border-gray-100 flex items-center justify-between">
+                <div>
+                    <h2 className="text-xl font-bold text-gray-800">Project Scoping</h2>
+                    <p className="text-xs text-gray-500">Powered by Daniel AI</p>
+                </div>
+                <div className="flex items-center space-x-2 bg-red-50 px-3 py-1 rounded-full border border-red-100">
+                    <div className="w-2 h-2 rounded-full bg-red-500 animate-pulse"></div>
+                    <span className="text-xs font-medium text-red-700">Live Session</span>
+                </div>
             </div>
 
             <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-50">
@@ -109,20 +115,31 @@ const ChatInterface = ({ onboardingData, onComplete }) => {
                 )}
 
                 {messages.map((msg, idx) => (
-                    <div key={idx} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-                        <div className={`max-w-[80%] rounded-lg p-3 ${msg.role === 'user'
-                            ? 'bg-red-600 text-white rounded-br-none'
-                            : msg.role === 'error'
-                                ? 'bg-red-100 text-red-800'
-                                : 'bg-white border border-gray-200 text-gray-800 rounded-bl-none shadow-sm'
-                            }`}>
+                    <div key={idx} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'} ${msg.role === 'model' ? 'space-x-2' : ''}`}>
+                        {msg.role === 'model' && (
+                            <div className="w-8 h-8 rounded-full overflow-hidden flex-shrink-0 mt-1 shadow-sm border border-red-100 bg-white">
+                                <img src="/daniel_avatar.png" alt="Daniel AI" className="w-full h-full object-cover" />
+                            </div>
+                        )}
+                        <div
+                            className={`max-w-[80%] rounded-lg p-3 text-sm ${msg.role === 'user'
+                                ? 'bg-red-600 text-white rounded-br-none shadow-md'
+                                : msg.role === 'error'
+                                    ? 'bg-red-100 text-red-800'
+                                    : 'bg-white border border-gray-200 text-gray-800 rounded-bl-none shadow-sm'
+                                }`}>
                             {msg.content}
                         </div>
                     </div>
                 ))}
                 {loading && (
-                    <div className="flex justify-start">
-                        <LoadingAnimation text="Daniel is thinking" />
+                    <div className="flex items-center space-x-2">
+                        <div className="w-8 h-8 rounded-full overflow-hidden flex-shrink-0 mt-1 shadow-sm border border-red-100 bg-white">
+                            <img src="/daniel_avatar.png" alt="Daniel AI" className="w-full h-full object-cover" />
+                        </div>
+                        <LoadingAnimation
+                            text={messages.filter(m => m.role === 'user').length >= 5 ? "Drafting your comprehensive report..." : "Daniel is thinking"}
+                        />
                     </div>
                 )}
                 <div ref={bottomRef} />
@@ -132,7 +149,7 @@ const ChatInterface = ({ onboardingData, onComplete }) => {
                 <div className="flex space-x-2">
                     <input
                         type="text"
-                        className="flex-1 border border-gray-300 rounded-full px-4 py-2 focus:outline-none focus:ring-2 focus:ring-red-500"
+                        className="flex-1 border border-gray-300 rounded-full px-4 py-2 focus:outline-none focus:ring-2 focus:ring-red-500 placeholder:text-gray-400 placeholder:font-light placeholder:italic"
                         placeholder={sessionId ? "Type your answer..." : "Briefly describe your project..."}
                         value={input}
                         onChange={(e) => setInput(e.target.value)}

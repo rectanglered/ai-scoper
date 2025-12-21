@@ -56,6 +56,13 @@ const Session = sequelize.define('Session', {
     }
 });
 
+const ErrorLog = sequelize.define('ErrorLog', {
+    timestamp: { type: DataTypes.DATE, defaultValue: DataTypes.NOW },
+    level: { type: DataTypes.STRING }, // 'error', 'warning', 'info'
+    message: { type: DataTypes.TEXT },
+    stack: { type: DataTypes.TEXT }
+});
+
 async function initDb() {
     try {
         await sequelize.sync({ alter: true }); // sync({ force: true }) to reset
@@ -68,5 +75,6 @@ async function initDb() {
 module.exports = {
     sequelize,
     Session,
+    ErrorLog,
     initDb
 };

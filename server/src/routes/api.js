@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const geminiService = require('../services/gemini');
-const { Session } = require('../database');
+const { Session, ErrorLog } = require('../database');
 
 // Start a new scoping session
 router.post('/start-session', async (req, res) => {
@@ -91,8 +91,8 @@ router.post('/answer', async (req, res) => {
         const newAnswers = [...session.answers, answer];
         const newHistory = [...session.history, { role: 'user', content: answer }];
 
-        // Determine if we have enough info (simple logic: 5 questions max for now)
-        if (newAnswers.length >= 5) {
+        // Determine if we have enough info (simple logic: 4 questions max for now)
+        if (newAnswers.length >= 4) {
             // Need the original description context for report generation
             const projectContext = `
                 Project: ${session.projectName}
@@ -241,6 +241,100 @@ router.get('/sessions', async (req, res) => {
     } catch (error) {
         console.error('Error fetching sessions:', error);
         res.status(500).json({ error: 'Failed to fetch sessions' });
+    }
+});
+
+// Submit Follow-up Message
+router.post('/submit-message', async (req, res) => {
+    try {
+        const { sessionId, message } = req.body;
+        const session = await Session.findOne({ where: { sessionId } });
+
+        if (!session) {
+            return res.status(404).json({ error: 'Session not found' });
+        }
+
+        const config = require('../../config.json');
+        if (config.sendgridApiKey && config.notificationEmail) {
+            const sgMail = require('@sendgrid/mail');
+            sgMail.setApiKey(config.sendgridApiKey);
+
+            const emailContent = `
+                <h1>New Message from Client</h1>
+                <p><strong>Client:</strong> ${session.contactName} (${session.contactCompany})</p>
+                <p><strong>Email:</strong> ${session.contactEmail}</p>
+                <p><strong>Project:</strong> ${session.projectName}</p>
+                <hr />
+                <h3>Message:</h3>
+                <p style="white-space: pre-wrap;">${message}</p>
+            `;
+
+            const msg = {
+                to: config.notificationEmail,
+                from: config.senderEmail || 'info@rectanglered.com',
+                subject: `Follow-up Message: ${session.contactCompany}`,
+                html: emailContent,
+            };
+
+            await sgMail.send(msg);
+        }
+
+        res.json({ success: true });
+    } catch (error) {
+        console.error('Error sending message:', error);
+        await ErrorLog.create({
+            level: 'error',
+            message: `Failed to send follow-up message: ${error.message}`,
+            stack: error.stack
+        });
+        res.status(500).json({ error: 'Failed to submit message' });
+    }
+});
+
+// Admin: Test Email
+router.post('/admin/test-email', async (req, res) => {
+    try {
+        const { email } = req.body;
+        const config = require('../../config.json');
+
+        if (!config.sendgridApiKey) {
+            throw new Error('SendGrid API Key not configured');
+        }
+
+        const sgMail = require('@sendgrid/mail');
+        sgMail.setApiKey(config.sendgridApiKey);
+
+        const msg = {
+            to: email,
+            from: config.senderEmail || 'info@rectanglered.com',
+            subject: 'Test Email from AI Scoper Admin',
+            text: 'This is a test email to verify your SendGrid configuration is working correctly.',
+            html: '<strong>Success!</strong> Your email configuration is working.'
+        };
+
+        await sgMail.send(msg);
+        res.json({ success: true });
+    } catch (error) {
+        console.error('Test email failed:', error);
+        await ErrorLog.create({
+            level: 'error',
+            message: `Test email failed: ${error.message}`,
+            stack: error.stack
+        });
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// Admin: Get Errors
+router.get('/admin/errors', async (req, res) => {
+    try {
+        const errors = await ErrorLog.findAll({
+            order: [['createdAt', 'DESC']],
+            limit: 50
+        });
+        res.json(errors);
+    } catch (error) {
+        res.status(500).json({ error: 'Failed to fetch errors' });
     }
 });
 

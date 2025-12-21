@@ -13,6 +13,20 @@ const OnboardingFlow = ({ onComplete }) => {
         selectedFeatures: []
     });
     const [suggestedFeatures, setSuggestedFeatures] = useState([]);
+    const [customFeature, setCustomFeature] = useState('');
+
+    const addCustomFeature = () => {
+        if (!customFeature.trim()) return;
+        const feature = customFeature.trim();
+        if (!suggestedFeatures.includes(feature)) {
+            setSuggestedFeatures(prev => [...prev, feature]);
+            setData(prev => ({
+                ...prev,
+                selectedFeatures: [...prev.selectedFeatures, feature]
+            }));
+        }
+        setCustomFeature('');
+    };
 
     const updateData = (field, value) => {
         setData(prev => ({ ...prev, [field]: value }));
@@ -129,6 +143,15 @@ const OnboardingFlow = ({ onComplete }) => {
             <div className="space-y-6">
                 {step === 1 && (
                     <div className="space-y-4">
+                        <div className="flex items-center space-x-4 mb-4 bg-red-50 p-4 rounded-lg border border-red-100">
+                            <div className="w-12 h-12 rounded-full overflow-hidden flex-shrink-0 bg-white shadow-sm">
+                                <img src="/daniel_avatar.png" alt="Daniel" className="w-full h-full object-cover" />
+                            </div>
+                            <div>
+                                <p className="text-gray-900 font-medium">Hi, I'm Daniel.</p>
+                                <p className="text-sm text-gray-600">I'll help you scope out your project. Let's start with the basics.</p>
+                            </div>
+                        </div>
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-1">
                                 Project Name (Optional)
@@ -136,7 +159,7 @@ const OnboardingFlow = ({ onComplete }) => {
                             <div className="flex space-x-2">
                                 <input
                                     type="text"
-                                    className="flex-1 border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-red-500 outline-none"
+                                    className="flex-1 border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-red-500 outline-none placeholder:text-gray-400 placeholder:font-light placeholder:italic"
                                     placeholder="e.g. Project Alpha"
                                     value={data.projectName}
                                     onChange={(e) => updateData('projectName', e.target.value)}
@@ -163,7 +186,7 @@ const OnboardingFlow = ({ onComplete }) => {
                                 Description (Required)
                             </label>
                             <textarea
-                                className="w-full border border-gray-300 rounded-lg px-4 py-2 h-32 focus:ring-2 focus:ring-red-500 outline-none"
+                                className="w-full border border-gray-300 rounded-lg px-4 py-2 h-32 focus:ring-2 focus:ring-red-500 outline-none placeholder:text-gray-400 placeholder:font-light placeholder:italic"
                                 placeholder="Describe what the project should do..."
                                 value={data.description}
                                 onChange={(e) => updateData('description', e.target.value)}
@@ -232,22 +255,56 @@ const OnboardingFlow = ({ onComplete }) => {
                             <div className="flex justify-center py-10">
                                 <LoadingAnimation text="Analyzing requirements" />
                             </div>
-                        ) : suggestedFeatures.length === 0 ? (
-                            <div className="text-center py-4 text-gray-500">
-                                No specific features suggested, but you can proceed.
-                            </div>
                         ) : (
-                            suggestedFeatures.map(opt => (
-                                <label key={opt} className="flex items-center space-x-3 p-4 border rounded-lg cursor-pointer hover:bg-red-50 transition-colors">
-                                    <input
-                                        type="checkbox"
-                                        className="w-5 h-5 text-red-600 rounded focus:ring-red-500"
-                                        checked={data.selectedFeatures.includes(opt)}
-                                        onChange={() => toggleSelection('selectedFeatures', opt)}
-                                    />
-                                    <span className="text-gray-700 font-medium">{opt}</span>
-                                </label>
-                            ))
+                            <>
+                                <div className="flex items-center space-x-4 mb-4 bg-red-50 p-4 rounded-lg border border-red-100">
+                                    <div className="w-12 h-12 rounded-full overflow-hidden flex-shrink-0 bg-white shadow-sm">
+                                        <img src="/daniel_avatar.png" alt="Daniel" className="w-full h-full object-cover" />
+                                    </div>
+                                    <div>
+                                        <p className="text-gray-900 font-medium">Here's what I think you'll need.</p>
+                                        <p className="text-sm text-gray-600">Based on your description, I've drafted a list of features. Review them and add any I missed.</p>
+                                    </div>
+                                </div>
+
+                                {suggestedFeatures.map(opt => (
+                                    <label key={opt} className="flex items-center space-x-3 p-4 border rounded-lg cursor-pointer hover:bg-red-50 transition-colors">
+                                        <input
+                                            type="checkbox"
+                                            className="w-5 h-5 text-red-600 rounded focus:ring-red-500"
+                                            checked={data.selectedFeatures.includes(opt)}
+                                            onChange={() => toggleSelection('selectedFeatures', opt)}
+                                        />
+                                        <span className="text-gray-700 font-medium">{opt}</span>
+                                    </label>
+                                ))}
+
+                                <div className="mt-4 pt-4 border-t border-gray-100">
+                                    <label className="block text-sm font-medium text-gray-700 mb-2">Add a custom feature:</label>
+                                    <div className="flex gap-2">
+                                        <input
+                                            type="text"
+                                            className="flex-1 border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-red-500 outline-none placeholder:text-gray-400 placeholder:font-light placeholder:italic"
+                                            placeholder="e.g. Admin Dashboard"
+                                            value={customFeature}
+                                            onChange={(e) => setCustomFeature(e.target.value)}
+                                            onKeyDown={(e) => {
+                                                if (e.key === 'Enter') {
+                                                    e.preventDefault();
+                                                    addCustomFeature();
+                                                }
+                                            }}
+                                        />
+                                        <button
+                                            onClick={addCustomFeature}
+                                            disabled={!customFeature.trim()}
+                                            className="bg-gray-800 text-white px-4 py-2 rounded-lg hover:bg-gray-900 transition-colors disabled:opacity-50"
+                                        >
+                                            Add
+                                        </button>
+                                    </div>
+                                </div>
+                            </>
                         )}
                     </div>
                 )}

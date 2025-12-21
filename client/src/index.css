@@ -4,3 +4,10 @@ body {
     background-color: #f3f4f6;
     /* gray-100 */
 }
+
+/* Force fainter placeholders globally as requested */
+::placeholder {
+    color: lightgray !important;
+    opacity: 1;
+    /* Firefox override */
+}
