@@ -164,7 +164,7 @@ function App() {
       </main >
 
       <footer className="mt-12 text-sm text-gray-400">
-        &copy; {new Date().getFullYear()} Rectangle Red. Powered by Daniel AI.
+        &copy; {new Date().getFullYear()} Rectangle Red. Powered by Daniel AI. v1.0.1
         <span className="ml-4 inline-flex items-center space-x-2" title={serverStatus === 'online' ? "Server Online" : "Server Offline"}>
           <span className={`block w-2 h-2 rounded-full ${serverStatus === 'online' ? 'bg-green-500' : serverStatus === 'checking' ? 'bg-yellow-500' : 'bg-red-500'}`}></span>
           <span className="text-xs text-gray-400 capitalize">{serverStatus}</span>

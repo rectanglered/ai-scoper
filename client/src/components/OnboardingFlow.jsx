@@ -197,6 +197,7 @@ const OnboardingFlow = ({ onComplete }) => {
                                 </span>
                             </div>
                         </div>
+
                     </div>
                 )}
 
@@ -308,6 +309,12 @@ const OnboardingFlow = ({ onComplete }) => {
                         )}
                     </div>
                 )}
+            </div>
+
+            <div className="mt-6 pt-4 border-t border-gray-100 flex justify-center">
+                <label className="text-sm font-medium text-gray-500">
+                    Prefer to talk to a human? Call <span className="text-gray-900">01908 887180</span> or email <a href="mailto:info@rectanglered.com" className="text-red-600 hover:text-red-700">info@rectanglered.com</a>
+                </label>
             </div>
 
             <div className="mt-8 flex justify-between">

@@ -106,7 +106,7 @@ const ChatInterface = ({ onboardingData, onComplete }) => {
             <div className="bg-white p-6 border-b border-gray-100 flex items-center justify-between">
                 <div>
                     <h2 className="text-xl font-bold text-gray-800">Project Scoping</h2>
-                    <p className="text-xs text-gray-500">Powered by Daniel AI</p>
+                    <p className="text-xs text-gray-500">Powered by Daniel AI v1.0.1</p>
                 </div>
                 <div className="flex items-center space-x-2 bg-red-50 px-3 py-1 rounded-full border border-red-100">
                     <div className="w-2 h-2 rounded-full bg-red-500 animate-pulse"></div>
